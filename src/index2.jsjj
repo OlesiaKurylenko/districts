@@ -1,0 +1,17 @@
+import { Client, Status } from "@googlemaps/google-maps-services-js";
+
+ar triangleCoords = [
+    { lat: 25.774, lng: -80.190 },
+    { lat: 18.466, lng: -66.118 },
+    { lat: 32.321, lng: -64.757 },
+    { lat: 25.774, lng: -80.190 }
+];
+
+// Construct the polygon.
+var bermudaTriangle = new google.maps.Polygon({ paths: triangleCoords });
+
+let test = { lat: 24.96301273, lng: -70 };
+var resultColor = google.maps.geometry.poly.containsLocation(test, bermudaTriangle)
+
+console.log('### res ##', resultColor);
+

@@ -1,0 +1,19 @@
+{
+  "name": "geojson",
+  "version": "1.0.0",
+  "description": "GeoJSON and other shape files for the federal legislative districts of the US.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OlesiaKurylenko/districts.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/OlesiaKurylenko/districts/issues"
+  },
+  "homepage": "https://github.com/OlesiaKurylenko/districts#readme"
+}
