@@ -3,27 +3,38 @@ class GeoJsonData {
 
     constructor(fileName, coordinates, radius) {
         this.fileName = fileName;
-        this.side1 = 0;
-        this.side2 = 0;
+        this.distAB = 0;
+        this.distAC = 0;
 
         this.coordinates = coordinates;
         this.data = [];
-        this.radius = radius || 2;
+        this.radius = radius;
+
         this.stepLongitude = 0;
         this.stepLatitude = 0;
-    }
-    setDistSide(side1, side2) {
-        this.side1 = side1;
-        this.side2 = side2;
-        let sides = this.getSides();
-        let step1 = sides.side1.B[0] - sides.side1.A[0];
-        let step2 = sides.side2.B[1] - sides.side2.A[1];
 
-        this.stepLongitude = (step1 / side1) * this.radius;
-        this.stepLatitude = (step2 / side2) * this.radius;
-        console.log(this.stepLongitude, this.stepLatitude)
+        this.firstStepLongitude = 0;
+        this.firstStepLatitude = 0;
+    }
+    setDistSide(distAB, distAC) {
+        this.distAB = distAB;
+        this.distAC = distAC;
+
+        let sides = this.getSides();
+
+
+        let step1 = sides.side1.B[0] - sides.side1.A[0]; // hor
+        let step2 = sides.side2.C[1] - sides.side2.A[1]; // vertical
+
+        this.stepLongitude = (step1 / distAB) * this.radius;
+        this.stepLatitude = (step2 / distAC) * this.radius;
+
+        this.firstStepLongitude = (sides.side1.B[0] - (sides.side1.A[0] + Math.floor(step1 / (this.stepLongitude * 2)) * (this.stepLongitude * 2))) / 2;
+        this.firstStepLatitude = (sides.side2.C[1] - (sides.side2.A[1] + Math.floor(step2 / (this.stepLatitude * 2)) * (this.stepLatitude * 2))) / 2;
+
     }
     getSides() {
+
         return {
             side1: {
                 A: [this.coordinates.longitude.min.value, this.coordinates.latitude.min.value],
@@ -31,25 +42,26 @@ class GeoJsonData {
             },
             side2: {
                 A: [this.coordinates.longitude.min.value, this.coordinates.latitude.min.value],
-                B: [this.coordinates.longitude.min.value, this.coordinates.latitude.max.value]
+                C: [this.coordinates.longitude.min.value, this.coordinates.latitude.max.value]
             }
         }
     }
 
     generatedArrayPoints() {
         let k = 0;
-        for (let i = this.coordinates.longitude.min.value + this.stepLatitude; i < this.coordinates.longitude.max.value; i += this.stepLatitude * 2) {
-            for (let j = this.coordinates.latitude.min.value + this.stepLongitude; j < this.coordinates.latitude.max.value; j += this.stepLongitude * 2) {
+
+        for (let i = this.coordinates.longitude.min.value + this.firstStepLongitude; i < this.coordinates.longitude.max.value; i += this.stepLongitude * 2) {
+            for (let j = this.coordinates.latitude.min.value + this.firstStepLatitude; j < this.coordinates.latitude.max.value; j += this.stepLatitude * 2) {
+                // console.log('LAT ', j, '\tLON ', i)
                 this.data.push({
                     coordinate: [j, i],
                     isContainsLocation: false
                 });
-                k++;
-                if (k > 160) return;
             }
         }
         return this.data;
     }
+
     updateData(data) {
         this.data = data;
     }

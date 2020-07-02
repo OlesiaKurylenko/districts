@@ -2,14 +2,14 @@ const fs = require('fs');
 
 class FileHelper {
 
-    static getFiles(dir, files_) {
+    getFiles(dir, files_) {
 
         files_ = files_ || [];
-        var files = fs.readdirSync(dir);
-        for (var i in files) {
-            var name = dir + '/' + files[i];
+        let files = fs.readdirSync(dir);
+        for (let i in files) {
+            let name = dir + '/' + files[i];
             if (fs.statSync(name).isDirectory()) {
-                FileHelper.getFiles(name, files_);
+                this.getFiles(name, files_);
             } else {
                 if (!name.includes('shape'))
                     files_.push(name);
@@ -18,28 +18,35 @@ class FileHelper {
         return files_;
     };
 
-    static readFile(path) {
+    readFile(path) {
         let data = fs.readFileSync(path);
         return data;
     }
 
-    static writeFile(path, data) {
+    writeFile(path, data) {
         let logger = null;
-        try {
-            logger = fs.createWriteStream(path, { flags: 'a' });
 
-            data.forEach(element => {
-                logger.write(element);
-            });
+        console.log(path, data);
 
-            logger.end();
-        }
-        catch (err) {
-            if (logger)
+        logger = fs.createWriteStream(path)
+
+        logger
+            .on('open', () => {
+                data.forEach(element => {
+                    logger.write(element);
+                });
                 logger.end();
-            return false;
-        }
+            })
+            .on('finish', () => {
+                console.log('finish write stream, moving along');
+                return true;
+            })
+            .on('error', (err) => { console.log(err); return false; });
 
+    }
+
+    writeFile2(path, data) {
+        fs.writeFileSync(path, data);
         return true;
     }
 }
